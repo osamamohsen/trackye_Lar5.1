@@ -15,6 +15,8 @@ class HomeController extends Controller
         return User::all();
     }
 
+
+
     public function attachUserRole($userId,$role){
         $user = User::find($userId);
 

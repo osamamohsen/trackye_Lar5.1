@@ -2,7 +2,7 @@
 
 use App\User;
 use Illuminate\Database\Seeder;
-
+use Faker\Factory as Facker;
 class UsersTableSeeder extends Seeder
 {
     /**
@@ -12,11 +12,14 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+        $facker = Facker::create();
 
-        User::create([
-            'name' => 'mando',
-            'email' => 'mando@localhost.com',
-            'password' =>'secret'
-        ]);
+        foreach(range(1,50) as $index){
+            User::create([
+                'name' => $facker->name.$index,
+                'email' => $facker->email,
+                'password' =>bcrypt('secret')
+            ]);
+        }//end foreach
     }
 }

@@ -15,6 +15,14 @@ https://packagist.org/packages/laracasts/generators
 https://packagist.org/packages/tymon/jwt-auth
 
 
+You can Just
+
+1- git clone project
+2- install composer
+3- php artisan key:generate
+5- make your .env file and copy .env.example to it
+4- php artisan migrate
+
 
 
 

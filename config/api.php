@@ -169,7 +169,7 @@ return [
     */
 
     'auth' => [
-
+        'jwt' => 'Dingo\Api\Auth\Provider\JWT'
     ],
 
     /*
@@ -217,6 +217,7 @@ return [
     'formats' => [
 
         'json' => Dingo\Api\Http\Response\Format\Json::class,
+
 
     ],
 

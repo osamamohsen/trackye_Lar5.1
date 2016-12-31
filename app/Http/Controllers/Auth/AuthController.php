@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use JWTAuth;
+use App\User;
+use Mockery\CountValidator\Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class AuthController extends Controller
 {
@@ -15,7 +20,7 @@ class AuthController extends Controller
         // Apply the jwt.auth middleware to all methods in this controller
         // except for the authenticate method. We don't want to prevent
         // the user from retrieving their token if they don't already have it
-        $this->middleware('jwt.auth', ['except' => ['authenticate']]);
+//        $this->middleware('jwt.auth', ['except' => ['authenticate','index','show']]);
     }
     /*
     |--------------------------------------------------------------------------
@@ -75,6 +80,59 @@ class AuthController extends Controller
         return response()->json(compact('token'));
     }
 
+
+    /*
+     * Return All users
+     */
+    public function index(){
+        return User::all();
+    }
+
+    /**
+     * Get User Based ID using token
+     */
+    public function show(){
+        try{
+           $user =  JWTAuth::parseToken()->toUser();
+            if(!$user){
+                return $this->response->errorNotFound('User Not Found');
+            }
+        }catch (JWTException $ex){
+            return $this->response->error('Token is invalid');
+        }
+
+        return $this->response->array(compact('user'))->setStatusCode(200);
+    }
+
+    /**
+     * Refresh the Token back to client
+     */
+    public function getToken(){
+        $token = JWTAuth::getToken();
+        if(!$token){
+            return $this->response->errorUnauthorized('Token is Invalid');
+        }
+        try{
+            $refreshToken = JWTAuth::refresh($token);
+        }catch (JWTException $ex){
+            return $this->response->error('someThingWentWrong');
+        }
+        return $this->response->array(compact('refreshToken'));
+    }
+
+    public function delete(){
+        $user = JWTAuth::parseToken()->authenticate();
+//        return $user;
+        if(!$user){
+            return $this->response->error('system can not Recognize to User');
+        }
+        try{
+            $result = $user->delete();
+        }catch (JWTException $ex){
+            return $this->response->error('someThingWentWrong');
+        }
+        return $this->response->json(['result'=>'User Has Been Deleted'])->getStatusCode(200);
+    }
     /**
      * Create a new user instance after a valid registration.
      *
@@ -89,4 +147,6 @@ class AuthController extends Controller
             'password' => bcrypt($data['password']),
         ]);
     }
+
+
 }
